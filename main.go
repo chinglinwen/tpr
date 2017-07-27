@@ -27,22 +27,26 @@ var (
 func main() {
 	var p tcpproxy.Proxy
 	for _, v := range config.Services {
-		if v.Type == "https" {
-			if v.From == "" && v.To != "" {
-				p.AddRoute(v.Port, tcpproxy.To(v.To)) // fallback
-				continue
-			}
-			p.AddSNIRoute(v.Port, v.From, tcpproxy.To(v.To))
-			continue
-		}
-
-		if v.From == "" && v.To != "" {
-			p.AddRoute(v.Port, tcpproxy.To(v.To)) // fallback
-			continue
-		}
-		p.AddHTTPHostRoute(v.Port, v.From, tcpproxy.To(v.To))
+		serviceAdd(p, v)
 	}
 	log.Fatal(p.Run())
+}
+
+func serviceAdd(p tcpproxy.Proxy, v Service) {
+	if v.Type == "https" {
+		if v.From == "" && v.To != "" {
+			p.AddRoute(v.Port, tcpproxy.To(v.To)) // fallback
+			return
+		}
+		p.AddSNIRoute(v.Port, v.From, tcpproxy.To(v.To))
+		return
+	}
+
+	if v.From == "" && v.To != "" {
+		p.AddRoute(v.Port, tcpproxy.To(v.To)) // fallback
+		return
+	}
+	p.AddHTTPHostRoute(v.Port, v.From, tcpproxy.To(v.To))
 }
 
 func init() {
