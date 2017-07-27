@@ -1,5 +1,6 @@
 # tpr
 tcp, http(s) reverse proxy
+> minimal nginx alike.
 
 ## Usage
 
@@ -7,7 +8,6 @@ tcp, http(s) reverse proxy
 Usage of ./tpr:
   -c string
         toml config file (default "config.toml")
-
 ```
 
 ## Example complete config file
@@ -35,6 +35,8 @@ from="e2.foo.com"
 to="localhost:443"
 ```
 
-> ** Note **
-> the from value's domain needs to resolvable
-> say domain foo.com need resolve to machine which run tpr.
+> **Note**
+>
+> the from value's domain needs to resolvable.
+>
+> say domain foo.com must resolved to the machine which run tpr.
