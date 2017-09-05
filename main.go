@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/BurntSushi/toml"
@@ -22,17 +23,19 @@ type Service struct {
 var (
 	config  Config
 	cfgfile = flag.String("c", "config.toml", "toml config file")
+	verbose = flag.Bool("v", true, "verbose")
 )
 
 func main() {
-	var p tcpproxy.Proxy
+	p := &tcpproxy.Proxy{}
 	for _, v := range config.Services {
+		print("added", v)
 		serviceAdd(p, v)
 	}
 	log.Fatal(p.Run())
 }
 
-func serviceAdd(p tcpproxy.Proxy, v Service) {
+func serviceAdd(p *tcpproxy.Proxy, v Service) {
 	if v.Type == "https" {
 		if v.From == "" && v.To != "" {
 			p.AddRoute(v.Port, tcpproxy.To(v.To)) // fallback
@@ -54,5 +57,11 @@ func init() {
 	_, err := toml.DecodeFile(*cfgfile, &config)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func print(a ...interface{}) {
+	if *verbose {
+		fmt.Println(a...)
 	}
 }
