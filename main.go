@@ -4,9 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 
 	"github.com/BurntSushi/toml"
-	"github.com/bradfitz/tcpproxy"
+	"github.com/inetaf/tcpproxy"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 type Config struct {
@@ -28,6 +31,10 @@ var (
 
 func main() {
 	p := &tcpproxy.Proxy{}
+	p.ListenFunc = func(net string, laddr string) (net.Listener, error) {
+		log.Printf("listening on: %v", laddr)
+		return autocert.NewListener(laddr), nil
+	}
 	for _, v := range config.Services {
 		print("added", v)
 		serviceAdd(p, v)
